@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mixpanel - Project</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;1,400&display=swap');
+  :root{--navy:#0C142B;--cream:#FFF8EE;--cream2:#FFEFD9;--paper:#fff;--pink:#FA3576;--pink-deep:#C81E5C;--yellow:#FFA30F;--ink:#0C142B;--mute:#6b6680;--line:#F0E7D6;--good:#1a8a3a;--font:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);font-weight:400;color:var(--ink);background:var(--navy);overflow:hidden;-webkit-font-smoothing:antialiased}
+  .deck{height:100vh;width:100vw;position:relative}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:6.5vh 6vw 8vh;animation:fade .35s ease;overflow:auto;background:var(--cream)}
+  .slide.active{display:flex}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .slide.dark{background:var(--navy);color:#fff;background-image:linear-gradient(rgba(12,20,43,.72),rgba(12,20,43,.86)),url("brand/backgrounds/curve-pattern-navy.jpg");background-size:cover;background-position:center}
+  .slide.dark h1,.slide.dark h2{color:#fff}.slide.dark .lead{color:#cfd2e0}
+  .slide.title-hero{background-image:none;background:#0C142B}
+  h1{font-weight:600;font-size:clamp(36px,6vw,84px);line-height:1.03;letter-spacing:-.02em}
+  h2{font-weight:600;font-size:clamp(26px,3.4vw,48px);color:var(--navy);letter-spacing:-.01em}
+  h3{font-weight:600;font-size:clamp(15px,1.6vw,21px);color:var(--navy)}
+  p,li{font-weight:400;font-size:clamp(14px,1.55vw,20px);line-height:1.5}
+  .eyebrow{font-size:13px;letter-spacing:.06em;color:var(--pink);font-weight:600;margin-bottom:12px;text-transform:uppercase}
+  .slide.dark .eyebrow{color:var(--yellow)}
+  .kw{color:var(--pink);font-weight:600}
+  .lead{font-size:clamp(17px,2vw,27px);color:var(--mute);max-width:60ch;margin-top:.5em}
+  .center{justify-content:center}
+  /* status chips */
+  .chip{display:inline-block;font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+  .c-done{background:#BFEACB;color:#0B6E2E} .c-prog{background:#DEEBFB;color:#1F5FA8}
+  .c-ong{background:#FBEAD2;color:#B0741A} .c-todo{background:#DDD0F4;color:#5A1FB8}
+  .c-dec{background:#FCE4EE;color:#C81E5C}
+  /* stage list */
+  .stage{list-style:none;margin:18px 0 0;max-width:none}
+  .stage li{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:.5em 0;font-size:clamp(13px,1.35vw,18px);padding-bottom:.45em;border-bottom:1px solid var(--line)}
+  .stage li .t{flex:1}
+  .stage .t::before{content:"•";color:var(--pink);font-weight:700;margin-right:11px}
+  .stage .chip{margin-left:0;flex:0 0 auto;min-width:96px;text-align:center}
+  .sub{color:var(--mute);font-size:.85em}
+  /* agenda */
+  .agenda{list-style:none;margin:18px 0 0}
+  .agenda li{display:flex;align-items:center;gap:16px;margin:.6em 0;font-size:clamp(18px,2.2vw,30px);font-weight:600;color:var(--navy)}
+  .agenda .n{flex:0 0 auto;width:44px;height:44px;border-radius:11px;background:var(--navy);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:19px}
+  .callout{background:var(--cream2);border-left:5px solid var(--pink);border-radius:0 12px 12px 0;padding:13px 18px;margin-top:16px;font-size:clamp(14px,1.6vw,20px);color:var(--navy)}
+  .skills-list{list-style:none;margin:10px 0 0}
+  .skills-list li{margin:.3em 0;font-size:clamp(14px,1.55vw,20px)}
+  .skills-list code{font-family:ui-monospace,Menlo,monospace;background:var(--cream2);padding:1px 7px;border-radius:5px;font-size:.9em;color:var(--pink-deep)}
+  /* footer + chrome */
+  .footer{position:fixed;bottom:0;left:0;right:0;height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 24px;background:var(--navy);color:#cfd2e0;font-size:12px;z-index:6}
+  .nav button{border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;border-radius:8px;padding:5px 11px;cursor:pointer;font-size:13px;margin-left:6px;font-family:var(--font)}
+  .nav button:hover{border-color:var(--yellow);color:var(--yellow)}
+  .bar{position:fixed;top:0;left:0;height:4px;background:var(--pink);z-index:7;transition:width .3s}
+  .logo{position:fixed;top:24px;right:32px;height:28px;width:auto;z-index:5;color:var(--navy)}
+  .logo.bright{color:#fff}
+  /* ===== Mixpanel Kit slide ===== */
+  .kit{margin-top:10px}
+  .krow{display:grid;grid-template-columns:84px repeat(5,1fr);gap:10px;align-items:stretch}
+  .krow + .krow{margin-top:8px}
+  .krow-pipe{margin-bottom:24px}
+  .krow-out{margin-top:6px}
+  .krow-out .cell{font-size:13px;padding:13px 12px;line-height:1.38;font-weight:500;color:var(--navy);background:#FBF4E8}
+  .rowlabel{font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--mute);text-transform:uppercase;display:flex;align-items:center}
+  .pillsrow{display:grid;grid-template-columns:84px repeat(5,1fr);gap:10px;margin-bottom:6px;align-items:end;min-height:30px}
+  .ckpt{justify-self:center;align-self:end;background:#fff;border:1px solid var(--pink);color:var(--pink-deep);font-size:12px;font-weight:600;padding:3px 11px;border-radius:999px;white-space:nowrap}
+  .ck1{grid-column:3 / 5;grid-row:1} .ck2{grid-column:4 / 6;grid-row:1}
+  .phase{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:0 6px 18px rgba(12,20,43,.05);display:flex;flex-direction:column;align-items:center;gap:7px}
+  .phase:not(:last-child)::after{content:"›";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--pink);font-size:20px;font-weight:700;z-index:2}
+  .tile{width:42px;height:42px;border-radius:11px;background:var(--cream2);display:flex;align-items:center;justify-content:center}
+  .tile svg{width:22px;height:22px;stroke:var(--navy);fill:none;stroke-width:1.7}
+  .pn{font-size:10px;font-weight:600;letter-spacing:.05em;color:var(--pink);text-transform:uppercase}
+  .phase h4{font-weight:600;font-size:clamp(14px,1.5vw,19px);color:var(--navy);line-height:1.1}
+  .phase small{color:var(--mute);font-size:11px}
+  .cell{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 9px;font-size:11px;line-height:1.3;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
+  .owner{font-size:11px;font-weight:600;padding:3px 12px;border-radius:999px}
+  .owner.pm{background:var(--navy);color:#fff} .owner.rd{background:var(--pink);color:#fff}
+  .skill code{font-family:ui-monospace,Menlo,monospace;background:var(--cream2);padding:1px 5px;border-radius:4px;font-size:10px;color:var(--ink)}
+  .mode{font-weight:600;font-size:11px} .mode.pink{color:var(--pink)} .mode.dark{color:var(--navy)} .mode.muted{color:var(--mute);font-style:italic}
+  .st{font-size:11px;font-weight:600;padding:3px 12px;border-radius:999px}
+  .st.built{background:var(--navy);color:#fff} .st.tbd{background:#fff;border:1px solid var(--pink);color:var(--pink-deep)}
+  .kitnote{font-size:12px;color:var(--mute);margin-top:12px;line-height:1.45}
+  .kitnote b{color:var(--navy)}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<svg id="logo" class="logo" width="298" height="68" viewBox="0 0 298 68" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Datarails"><path d="M16.8709 23.6053C8.58351 25.5292 2.18296 31.8927 0.185102 40.1616L0.0371094 40.7536H5.9382L6.04918 40.4206C7.69557 35.1485 11.8393 31.0603 17.1114 29.4509L17.4444 29.3399V23.4573L16.8524 23.5868L16.8709 23.6053Z" fill="#FDA111"></path><path d="M247.01 0C245.123 0 243.569 1.53539 243.569 3.44076C243.569 5.34612 245.105 6.88151 247.01 6.88151C248.915 6.88151 250.451 5.34612 250.451 3.44076C250.451 1.53539 248.915 0 247.01 0Z" fill="#F73476"></path><path d="M286.32 43.0879L280.678 41.7005C276.571 40.7201 274.499 38.6667 274.499 35.633C274.499 31.5263 278.643 29.0659 282.638 29.0659C287.282 29.0659 290.574 31.7297 290.815 35.7069L290.852 36.1509H296.586V35.6514C296.29 28.548 290.593 23.5718 282.694 23.5718C275.849 23.5718 268.764 28.104 268.764 35.6885C268.764 41.46 272.205 45.1413 279.272 46.9357L284.858 48.3231C289.927 49.47 292.535 52.2263 292.221 56.0925C291.74 59.1818 289.187 62.4745 283.452 62.4745C280.9 62.4745 278.532 61.6051 276.756 60.0512C275.239 58.7193 274.314 57.0174 274.148 55.2601L274.111 54.8161H268.376V55.3156C268.727 61.4571 274.444 67.8207 283.452 67.8207C287.448 67.8207 290.926 66.6738 293.534 64.5094C295.939 62.5116 297.456 59.6998 297.844 56.5735C298.917 48.1196 292.184 44.5678 286.338 43.0694L286.32 43.0879Z" fill="currentColor"></path><path d="M89.867 30.3748L88.4796 29.0613C84.2989 25.1581 78.8788 23.0123 73.1812 23.0123C60.8241 23.0123 50.7607 33.0756 50.7607 45.4327C50.7607 57.7898 60.8056 67.8531 73.1812 67.8531C78.8788 67.8531 84.3174 65.7072 88.4796 61.804L89.867 60.4906V67.2241H95.5831V23.6597H89.867V30.3933V30.3748ZM89.867 45.4327C89.867 54.645 82.375 62.1185 73.1812 62.1185C63.9873 62.1185 56.4953 54.6265 56.4953 45.4327C56.4953 36.2388 63.9873 28.7469 73.1812 28.7469C82.375 28.7469 89.867 36.2388 89.867 45.4327Z" fill="currentColor"></path><path d="M161.105 30.3748L159.718 29.0613C155.537 25.1581 150.117 23.0123 144.419 23.0123C132.062 23.0123 121.999 33.0756 121.999 45.4327C121.999 57.7898 132.044 67.8531 144.419 67.8531C150.117 67.8531 155.556 65.7072 159.718 61.804L161.105 60.4906V67.2241H166.821V23.6597H161.105V30.3933V30.3748ZM161.105 45.4327C161.105 54.645 153.613 62.1185 144.419 62.1185C135.226 62.1185 127.734 54.6265 127.734 45.4327C127.734 36.2388 135.226 28.7469 144.419 28.7469C153.613 28.7469 161.105 36.2388 161.105 45.4327Z" fill="currentColor"></path><path d="M180.753 28.1363L179.44 29.0983V23.6412H173.724V67.2056H179.44V41.9364C179.44 36.1463 183.768 31.2996 189.522 30.6522L189.947 30.5967V24.8621L189.429 24.8991C186.303 25.1396 183.306 26.2495 180.753 28.1179V28.1363Z" fill="currentColor"></path><path d="M230.976 30.3749L229.589 29.0614C225.408 25.1582 219.988 23.0124 214.291 23.0124C201.933 23.0124 191.87 33.0757 191.87 45.4328C191.87 57.7899 201.915 67.8532 214.291 67.8532C219.988 67.8532 225.427 65.7073 229.589 61.8041L230.976 60.4907V67.2242H236.692V23.6598H230.976V30.3933V30.3749ZM230.976 45.4328C230.976 54.6451 223.484 62.1186 214.291 62.1186C205.097 62.1186 197.605 54.6266 197.605 45.4328C197.605 36.2389 205.097 28.747 214.291 28.747C223.484 28.747 230.976 36.2389 230.976 45.4328Z" fill="currentColor"></path><path d="M249.883 11.8255H244.167V67.2105H249.883V11.8255Z" fill="currentColor"></path><path d="M263.067 0.0017395H257.351V67.2075H263.067V0.0017395Z" fill="currentColor"></path><path d="M108.198 11.8255H102.481V50.7837C102.481 59.6261 109.381 67.0995 118.205 67.8025L118.723 67.8395V62.1049L118.298 62.0494C112.545 61.4204 108.216 56.5553 108.216 50.7652V29.3437H118.779V23.6276H108.216V11.8255H108.198Z" fill="currentColor"></path><path d="M38.6807 30.382L37.2933 29.0686C34.4261 26.3678 30.8928 24.4809 27.1006 23.593L26.5086 23.4635V29.3461L26.8416 29.4571C33.9266 31.6029 38.6807 38.0219 38.6807 45.4214C38.6807 54.6338 31.1888 62.1072 21.9949 62.1072C18.2027 62.1072 14.4845 60.7938 11.5247 58.4075C8.89786 56.2801 6.937 53.3389 5.99357 50.1201L5.88258 49.7686H0L0.12949 50.3606C1.18392 54.9668 3.73673 59.2399 7.32548 62.3477C11.3952 65.881 16.6118 67.8233 21.9764 67.8233C27.674 67.8233 33.1127 65.6775 37.2749 61.7743L38.6623 60.4609V67.1944H44.3783V11.8093H38.6623V30.3635L38.6807 30.382Z" fill="currentColor"></path></svg>
+<div class="deck" id="deck">
+
+  <!-- 1 TITLE -->
+  <section class="slide dark center title-hero">
+    <div class="eyebrow">Datarails · Product Analytics</div>
+    <h1>Mixpanel</h1>
+    <p class="lead">Product-analytics project.</p>
+    <p style="margin-top:22px;color:#aab;font-size:14px"><b style="color:#fff">Owner:</b> Rony Gur · 2026-06-18</p>
+  </section>
+
+  <!-- 2 THE PROJECT -->
+  <section class="slide">
+    <div class="eyebrow">The project</div>
+    <h2>Three parts</h2>
+    <ul class="agenda">
+      <li><span class="n">1</span><span>Set up</span></li>
+      <li><span class="n">2</span><span>Data coverage</span></li>
+      <li><span class="n">3</span><span>Tools &amp; automation</span></li>
+    </ul>
+  </section>
+
+  <!-- 3 STAGE 1 -->
+  <section class="slide">
+    <div class="eyebrow">Part 1</div>
+    <h2>Set up</h2>
+    <ul class="stage">
+      <li><span class="t">Group Analytics</span><span class="chip c-dec">to decide</span></li>
+      <li><span class="t">Data view - Customers Only <span class="sub">(to add "log in as" event)</span></span><span class="chip c-prog">in progress</span></li>
+      <li><span class="t">Building Metrics in Mixpanel</span><span class="chip c-todo">to do</span></li>
+      <li><span class="t">Business context in Mixpanel</span><span class="chip c-todo">to do</span></li>
+      <li><span class="t">MCP - connected &amp; explored <span class="sub">(part of the skills)</span></span><span class="chip c-done">done</span></li>
+      <li><span class="t">Mixpanel agents - exploration</span><span class="chip c-prog">in progress</span></li>
+    </ul>
+  </section>
+
+  <!-- 4 STAGE 2 -->
+  <section class="slide">
+    <div class="eyebrow">Part 2</div>
+    <h2>Data coverage</h2>
+    <ul class="stage">
+      <li><span class="t">Decide what to tag - every PM declares the features they own <span class="sub">- Product</span></span><span class="chip c-ong">ongoing</span></li>
+      <li><span class="t">Complete implementation of the infrastructure with property values <span class="sub">- R&amp;D</span></span><span class="chip c-prog">in progress</span></li>
+      <li><span class="t">Automate as many parts of the flow as possible <span class="sub">- Rony</span></span><span class="chip c-prog">in progress</span></li>
+    </ul>
+  </section>
+
+  <!-- 5 STAGE 3 -->
+  <section class="slide">
+    <div class="eyebrow">Part 3</div>
+    <h2>Tools &amp; automation</h2>
+    <p class="lead" style="font-size:clamp(16px,1.9vw,24px)">Vision: <span class="kw">Automate the flow A-Z</span>.</p>
+    <h3 style="margin-top:18px">The Mixpanel Kit - 3 skills</h3>
+    <ul class="skills-list">
+      <li><code>mixpanel-measure</code> - define what to measure (questions / KPIs) before any events</li>
+      <li><code>mixpanel-tracking-plan</code> - from feature selection to a full tracking plan</li>
+      <li><code>mixpanel-publish</code> - after R&amp;D ships: validate events, fill Lexicon, build dashboards</li>
+    </ul>
+    <div class="callout"><b>Plus:</b> the Mixpanel MCP is combined into the skills - <code style="background:#fff;padding:1px 5px;border-radius:4px">manage-lexicon</code>, <code style="background:#fff;padding:1px 5px;border-radius:4px">create-dashboard</code>, <code style="background:#fff;padding:1px 5px;border-radius:4px">deep-research</code> and more…</div>
+  </section>
+
+  <!-- 6 THE MIXPANEL KIT PIPELINE -->
+  <section class="slide">
+    <div class="eyebrow">Datarails · Product Analytics</div>
+    <h2>The Mixpanel Kit</h2>
+    <p class="lead" style="font-size:clamp(15px,1.7vw,22px);margin-top:.2em">From a feature to <span class="kw">trustworthy analytics</span></p>
+    <p style="font-size:clamp(14px,1.5vw,20px);color:var(--mute);margin-top:.15em">The A-Z pipeline</p>
+    <div class="kit">
+      <div class="pillsrow"><span class="ckpt ck1">PM sign-off</span><span class="ckpt ck2">Events firing · PR</span></div>
+      <!-- PIPELINE -->
+      <div class="krow krow-pipe">
+        <div class="rowlabel">Pipeline</div>
+        <div class="phase"><span class="tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="var(--navy)" stroke="none"/></svg></span><span class="pn">Phase 1</span><h4>Measure</h4><small>define success</small></div>
+        <div class="phase"><span class="tile"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span><span class="pn">Phase 2</span><h4>Plan</h4><small>events + Jira</small></div>
+        <div class="phase"><span class="tile"><svg viewBox="0 0 24 24"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></span><span class="pn">Phase 3</span><h4>R&amp;D Build</h4><small>instrument code</small></div>
+        <div class="phase"><span class="tile"><svg viewBox="0 0 24 24"><path d="M12 16V5M8 9l4-4 4 4M5 19h14"/></svg></span><span class="pn">Phase 4</span><h4>Publish</h4><small>Lexicon + validate</small></div>
+        <div class="phase"><span class="tile"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 15l3-4 3 2 4-6"/></svg></span><span class="pn">Phase 5</span><h4>Analyze &amp; Report</h4><small>dashboards + reports</small></div>
+      </div>
+      <!-- OUTPUT -->
+      <div class="krow krow-out">
+        <div class="rowlabel">Output</div>
+        <div class="cell">Measurement strategy: questions, metrics, North Star, success definition</div>
+        <div class="cell">Tracking plan in the sheet + Jira ticket</div>
+        <div class="cell">Events + properties firing in Mixpanel</div>
+        <div class="cell">Lexicon filled + data validated</div>
+        <div class="cell">Dashboards, reports, funnels, retention - data ready to analyze</div>
+      </div>
+      <!-- OWNER -->
+      <div class="krow">
+        <div class="rowlabel">Owner</div>
+        <div class="cell"><span class="owner pm">PM</span></div>
+        <div class="cell"><span class="owner pm">PM</span></div>
+        <div class="cell"><span class="owner rd">R&amp;D</span></div>
+        <div class="cell"><span class="owner pm">PM</span></div>
+        <div class="cell"><span class="owner pm">PM</span></div>
+      </div>
+      <!-- SKILL + MODE -->
+      <div class="krow">
+        <div class="rowlabel">Skill + mode</div>
+        <div class="cell skill"><code>mixpanel-measure</code><span class="mode pink">Skill</span></div>
+        <div class="cell skill"><code>mixpanel-tracking-plan</code><span class="mode pink">Skill</span></div>
+        <div class="cell skill"><span class="mode muted">future skill?</span><span class="mode dark">Manual (code)</span></div>
+        <div class="cell skill"><code>mixpanel-publish</code><span class="mode pink">Skill + MCP</span></div>
+        <div class="cell skill"><code>mixpanel-publish</code> <code>+ create-dashboard</code><span class="mode pink">Skill + MCP</span></div>
+      </div>
+      <!-- STATUS -->
+      <div class="krow">
+        <div class="rowlabel">Status</div>
+        <div class="cell"><span class="st built">✓ Built</span></div>
+        <div class="cell"><span class="st built">✓ Built</span></div>
+        <div class="cell"><span class="st tbd">TBD</span></div>
+        <div class="cell"><span class="st built">✓ Built</span></div>
+        <div class="cell"><span class="st built">✓ Built</span></div>
+      </div>
+    </div>
+    <p class="kitnote"><b>Owner runs PM -> R&amp;D -> PM.</b> Two human checkpoints: PM sign-off after Plan; events firing / PR review before Publish. &nbsp; <b>Skill</b> = automated (includes the Mixpanel MCP where shown). <b>Built</b> = live today. <b>TBD</b> = candidate for a future skill, hand-coded for now.</p>
+  </section>
+
+  <!-- 7 WHAT IS LEFT -->
+  <section class="slide">
+    <div class="eyebrow">Next</div>
+    <h2>What is left</h2>
+    <ul class="stage">
+      <li><span class="t">Group Analytics decision</span><span class="chip c-dec">to decide</span></li>
+      <li><span class="t">Build Metrics in Mixpanel</span><span class="chip c-todo">to do</span></li>
+      <li><span class="t">Business context in Mixpanel</span><span class="chip c-todo">to do</span></li>
+      <li><span class="t">"log in as" event</span><span class="chip c-prog">in progress</span></li>
+      <li><span class="t">Finish R&amp;D infrastructure (property values)</span><span class="chip c-prog">in progress</span></li>
+      <li><span class="t">Build the automation (skills end-to-end)</span><span class="chip c-prog">in progress</span></li>
+      <li><span class="t">Every PM to choose a feature to test the new skills</span><span class="chip c-todo">to do</span></li>
+    </ul>
+  </section>
+
+</div>
+
+<div class="footer">
+  <div>Mixpanel · Datarails PMs · Rony Gur</div>
+  <div class="nav">
+    <span id="count" style="margin-right:10px"></span>
+    <button onclick="go(-1)">← Prev</button>
+    <button onclick="go(1)">Next →</button>
+    <button id="editBtn" onclick="toggleEdit()">Edit</button>
+    <button id="saveBtn" onclick="save()" style="display:none">Save copy</button>
+  </div>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0, editing=false;
+  function render(){
+    slides.forEach((s,n)=>s.classList.toggle('active',n===i));
+    document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+    document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+    const a=slides[i];
+    document.getElementById('logo').classList.toggle('bright', a.classList.contains('dark'));
+    if(a) a.scrollTop=0;
+  }
+  function go(d){i=Math.max(0,Math.min(slides.length-1,i+d));render();}
+  document.addEventListener('keydown',e=>{
+    if(editing || e.target.isContentEditable || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1);}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1);}
+    else if(e.key==='Home'){i=0;render();}else if(e.key==='End'){i=slides.length-1;render();}
+    else if(e.key.toLowerCase()==='f'){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen();}
+  });
+  document.getElementById('deck').addEventListener('click',e=>{if(!editing && !e.target.closest('button'))go(1);});
+  function toggleEdit(){editing=!editing;slides.forEach(s=>s.setAttribute('contenteditable',editing));
+    document.getElementById('editBtn').textContent=editing?'Done':'Edit';
+    document.getElementById('saveBtn').style.display=editing?'inline-block':'none';
+    if(editing){const a=slides[i];if(a)a.focus();}}
+  function save(){const clone=document.documentElement.cloneNode(true);
+    clone.querySelectorAll('.slide').forEach(s=>s.removeAttribute('contenteditable'));
+    const eb=clone.querySelector('#editBtn');if(eb)eb.textContent='Edit';
+    const sb=clone.querySelector('#saveBtn');if(sb)sb.style.display='none';
+    const blob=new Blob(["<!DOCTYPE html>\n"+clone.outerHTML],{type:'text/html'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Mixpanel-deck-edited.html';a.click();URL.revokeObjectURL(a.href);}
+  render();
+</script>
+</body>
+</html>
