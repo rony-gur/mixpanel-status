@@ -42,6 +42,7 @@
   .agenda li{display:flex;align-items:center;gap:16px;margin:.6em 0;font-size:clamp(18px,2.2vw,30px);font-weight:600;color:var(--navy)}
   .agenda .n{flex:0 0 auto;width:44px;height:44px;border-radius:11px;background:var(--navy);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:19px}
   .callout{background:var(--cream2);border-left:5px solid var(--pink);border-radius:0 12px 12px 0;padding:13px 18px;margin-top:16px;font-size:clamp(14px,1.6vw,20px);color:var(--navy)}
+  .callout code{font-family:ui-monospace,Menlo,monospace;background:#fff;padding:1px 6px;border-radius:5px;font-size:.86em;color:var(--pink-deep)}
   .skills-list{list-style:none;margin:10px 0 0}
   .skills-list li{margin:.3em 0;font-size:clamp(14px,1.55vw,20px)}
   .skills-list code{font-family:ui-monospace,Menlo,monospace;background:var(--cream2);padding:1px 7px;border-radius:5px;font-size:.9em;color:var(--pink-deep)}
@@ -130,6 +131,7 @@
       <li><span class="t">Mixpanel agents - exploration</span><span class="chip c-prog">in progress</span></li>
       <li><span class="t">Building Metrics in Mixpanel</span><span class="chip c-todo">to do</span></li>
       <li><span class="t">Business context in Mixpanel</span><span class="chip c-todo">to do</span></li>
+      <li><span class="t">Lexicon best practices - naming standardization <span class="sub">- Rony</span></span><span class="chip c-prog">in progress</span></li>
     </ul>
   </section>
 
@@ -140,11 +142,11 @@
     <ul class="stage">
       <li><span class="t">Decide what to tag - every PM declares the features they own <span class="sub">- Product</span></span><span class="chip c-ong">ongoing</span></li>
       <li><span class="t">Complete implementation of the infrastructure with property values <span class="sub">- R&amp;D</span></span><span class="chip c-prog">in progress</span></li>
-      <li><span class="t">Lexicon best practices - naming standardization <span class="sub">- Rony</span></span><span class="chip c-todo">to do</span></li>
       <li><span class="t">FE vs BE events - define best practice <span class="sub">- Rony</span></span><span class="chip c-todo">to do</span></li>
       <li><span class="t">Shared components - capture where used <span class="sub">- R&amp;D</span></span><span class="chip c-todo">to do</span></li>
       <li><span class="t">Automate as many parts of the flow as possible <span class="sub">- Rony</span></span><span class="chip c-prog">in progress</span></li>
     </ul>
+    <div class="callout"><b>Naming - one standard.</b> The Lexicon today mixes styles: <code>Save Settings</code>, <code>setup clicked on the navbar</code>, <code>open_unified_manage_filters</code>, plus autocapture junk. Going forward: <span class="kw">snake_case</span> <code>object_action</code> (e.g. <code>global_filter_created</code>) with a Title-Case display name in Lexicon. Existing names = migration backlog.</div>
   </section>
 
   <!-- 5 STAGE 3 -->
@@ -219,7 +221,25 @@
     <p class="kitnote"><b>Owner runs PM -> R&amp;D -> PM.</b> Two human checkpoints: PM sign-off after Plan; events firing / PR review before Publish. &nbsp; <b>Skill</b> = automated (includes the Mixpanel MCP where shown). <b>Built</b> = live today. <b>TBD</b> = candidate for a future skill, hand-coded for now.</p>
   </section>
 
-  <!-- 7 WHAT IS LEFT -->
+  <!-- 7 THE KIT - SKILLS EXPLAINED -->
+  <section class="slide">
+    <div class="eyebrow">The Mixpanel Kit</div>
+    <h2>3 skills, one pipeline</h2>
+    <p class="lead" style="font-size:clamp(15px,1.7vw,22px);margin-top:.25em">Measure <span class="kw">(why)</span> &rarr; Plan <span class="kw">(what + Jira)</span> &rarr; Publish <span class="kw">(activate)</span>. &nbsp;Two human checkpoints: <span class="kw">PM sign-off</span> and <span class="kw">PR review</span>.</p>
+    <ul class="skills-list" style="margin-top:14px">
+      <li style="margin:.7em 0"><b><code>mixpanel-measure</code> - decide why before tracking anything.</b><br>
+        <span class="sub">A quick guided session that pins down the business question, the metrics that answer it, the North Star, and what "success" means. The antidote to "track every click."</span><br>
+        <b style="color:var(--navy)">Output: the Use Cases + Measurement Framework tabs.</b></li>
+      <li style="margin:.7em 0"><b><code>mixpanel-tracking-plan</code> - turn a feature into a build-ready plan.</b><br>
+        <span class="sub">Reads the Figma, the help-center article, and the real product code, then writes the events + properties in the exact 20-column doc R&amp;D needs - North Star event first - and opens the Jira ticket.</span><br>
+        <b style="color:var(--navy)">Output: the Tracking Plan (sheet / TSV / CSV) + the R&amp;D ticket.</b></li>
+      <li style="margin:.7em 0"><b><code>mixpanel-publish</code> - after R&amp;D ships, finish it in Mixpanel.</b><br>
+        <span class="sub">Checks the events are actually firing, fills the Lexicon (display names, descriptions, tags, verified) via the Mixpanel MCP, validates data quality (catches junk like "undefined"), then builds the dashboards and metrics.</span><br>
+        <b style="color:var(--navy)">Output: enriched Lexicon + validated data + live dashboards.</b></li>
+    </ul>
+  </section>
+
+  <!-- 8 WHAT IS LEFT -->
   <section class="slide">
     <div class="eyebrow">Next</div>
     <h2>What is left</h2>
