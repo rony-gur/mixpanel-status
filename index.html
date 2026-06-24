@@ -42,6 +42,10 @@
   .agenda li{display:flex;align-items:center;gap:16px;margin:.6em 0;font-size:clamp(18px,2.2vw,30px);font-weight:600;color:var(--navy)}
   .agenda .n{flex:0 0 auto;width:44px;height:44px;border-radius:11px;background:var(--navy);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:19px}
   .callout{background:var(--cream2);border-left:5px solid var(--pink);border-radius:0 12px 12px 0;padding:13px 18px;margin-top:16px;font-size:clamp(14px,1.6vw,20px);color:var(--navy)}
+  .cmp{border-collapse:collapse;width:100%;margin-top:14px;background:var(--paper);border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(12,20,43,.05)}
+  .cmp th,.cmp td{border:1px solid var(--line);padding:9px 13px;text-align:left;font-size:clamp(12px,1.4vw,17px);vertical-align:middle}
+  .cmp th{background:var(--cream2);font-weight:600;color:var(--navy)}
+  .cmp .y{color:var(--good);font-weight:600} .cmp .n{color:var(--pink-deep);font-weight:600}
   .callout code{font-family:ui-monospace,Menlo,monospace;background:#fff;padding:1px 6px;border-radius:5px;font-size:.86em;color:var(--pink-deep)}
   .skills-list{list-style:none;margin:10px 0 0}
   .skills-list li{margin:.3em 0;font-size:clamp(14px,1.55vw,20px)}
@@ -134,6 +138,63 @@
       <li><span class="t">Lexicon best practices - naming standardization <span class="sub">- Rony</span></span><span class="chip c-prog">in progress</span></li>
     </ul>
     <div class="callout"><b>Naming - one standard.</b> The Lexicon today mixes styles: <code>Save Settings</code>, <code>setup clicked on the navbar</code>, <code>open_unified_manage_filters</code>, plus autocapture junk. Going forward: <span class="kw">snake_case</span> <code>object_action</code> (e.g. <code>global_filter_created</code>) with a Title-Case display name in Lexicon. Existing names = migration backlog.</div>
+  </section>
+
+  <!-- 3a GROUP ANALYTICS DECISION -->
+  <section class="slide">
+    <div class="eyebrow">Part 1 · Decision</div>
+    <h2>Group Analytics - buy it?</h2>
+    <p class="lead" style="font-size:clamp(15px,1.8vw,23px)">A paid add-on (~$2,400/yr) that lets Mixpanel count <span class="kw">accounts</span>, not just individual users.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px">
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 18px">
+        <h3 style="color:var(--good)">&#10003; Free without it</h3>
+        <ul class="skills-list" style="margin-top:8px">
+          <li>Break any report down by <code>org_id</code></li>
+          <li>Active users per account</li>
+          <li>Most of what we need in phase 1</li>
+        </ul>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 18px">
+        <h3 style="color:var(--pink-deep)">Needs the add-on</h3>
+        <ul class="skills-list" style="margin-top:8px">
+          <li>Count <b>unique accounts</b> (not users)</li>
+          <li><b>Retention</b> at the account level</li>
+          <li><b>Funnels</b> where the account converts if anyone in it does</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><b>The critical point:</b> we can buy it <b>later</b> and it works <b>retroactively</b> - but only if <code>org_id</code> rides on every event from day one.</div>
+    <div class="callout" style="border-left-color:var(--good);background:#E7F6EC"><b>Recommendation:</b> don't buy now. The only ask from R&amp;D: <code>org_id</code> on every event - keeps the option open without losing history.</div>
+  </section>
+
+  <!-- 3b AUTO-CAPTURE + IDENTITY DECISION -->
+  <section class="slide">
+    <div class="eyebrow">Part 1 · Decision</div>
+    <h2>Auto-capture &amp; user identity</h2>
+    <p class="lead" style="font-size:clamp(15px,1.8vw,23px)">Two data-capture calls to make up front - both hard to undo later.</p>
+    <h3 style="margin-top:16px">Auto-capture - Mixpanel logs clicks &amp; pageviews automatically, no code</h3>
+    <ul class="stage" style="margin-top:8px">
+      <li><span class="t">Generic, noisy events (<code>$click</code>) - the "autocapture junk" already in our Lexicon</span><span class="chip c-dec">trade-off</span></li>
+      <li><span class="t">Can capture text typed into inputs &rarr; PII risk on a finance product</span><span class="chip c-dec">trade-off</span></li>
+    </ul>
+    <div class="callout"><b>Strategy:</b> our curated <span class="kw">snake_case</span> named events are the source of truth. Keep auto-capture <b>off</b> for the tracking plan; existing autocapture events = migration backlog to deprecate.</div>
+    <h3 style="margin-top:18px">User name / email</h3>
+    <div class="callout" style="border-left-color:var(--navy)">Store <code>$name</code> / <code>$email</code> on the <b>user profile</b> (<code>people.set</code> after <code>identify</code>) so we can find a specific user in Mixpanel - <b>never</b> as an event or super property (keeps PII out of every event &amp; export). Identity key = stable internal user ID, not the email.</div>
+  </section>
+
+  <!-- 3b GROUP ANALYTICS -->
+  <section class="slide">
+    <div class="eyebrow">Set up · decision</div>
+    <h2>Group Analytics - do we pay?</h2>
+    <p class="lead" style="font-size:clamp(15px,1.7vw,21px)">Mixpanel counts <span class="kw">users</span> by default. The paid add-on lets us count <span class="kw">accounts</span>.</p>
+    <table class="cmp">
+      <tr><th>What we want</th><th>Without (free)</th><th>With (paid)</th></tr>
+      <tr><td>List / rank by org; count active accounts</td><td class="y">&#10003; distinct count of <code>organization_id</code></td><td class="y">&#10003;</td></tr>
+      <tr><td><b>Account retention</b> - do accounts come back</td><td class="n">&#10007; engine follows users</td><td class="y">&#10003;</td></tr>
+      <tr><td><b>Account funnels</b> - % of accounts converted</td><td class="n">&#10007; converts per user</td><td class="y">&#10003;</td></tr>
+      <tr><td><b>Group profiles</b> - ARR, plan, seats to cohort on</td><td class="n">&#10007; none</td><td class="y">&#10003;</td></tr>
+    </table>
+    <div class="callout"><b>Why we'd pay:</b> letting <code>organization_id</code> be the <b>linking column</b> in retention &amp; funnels is exactly what the add-on does - counting accounts is free; account retention + funnels need it. <b>Group key:</b> <code>organization_account_id</code> (customer) vs <code>organization_id</code> (workspace).</div>
   </section>
 
   <!-- 4 STAGE 2 -->
