@@ -167,19 +167,28 @@
     <div class="callout" style="border-left-color:var(--good);background:#E7F6EC"><b>Recommendation:</b> don't buy now. The only ask from R&amp;D: <code>org_id</code> on every event - keeps the option open without losing history.</div>
   </section>
 
-  <!-- 3b AUTO-CAPTURE + IDENTITY DECISION -->
+  <!-- 3b AUTOCAPTURE DECISION -->
   <section class="slide">
     <div class="eyebrow">Part 1 · Decision</div>
-    <h2>Auto-capture &amp; user identity</h2>
-    <p class="lead" style="font-size:clamp(15px,1.8vw,23px)">Two data-capture calls to make up front - both hard to undo later.</p>
-    <h3 style="margin-top:16px">Auto-capture - Mixpanel logs clicks &amp; pageviews automatically, no code</h3>
+    <h2>Autocapture - use it?</h2>
+    <p class="lead" style="font-size:clamp(15px,1.8vw,23px)">Mixpanel can log every click &amp; pageview automatically, no code. Tempting - but messy.</p>
+    <h3 style="margin-top:16px">The catch</h3>
     <ul class="stage" style="margin-top:8px">
-      <li><span class="t">Generic, noisy events (<code>$click</code>) - the "autocapture junk" already in our Lexicon</span><span class="chip c-dec">trade-off</span></li>
+      <li><span class="t">Generic, noisy events (<code>$click</code>) - you can't build real metrics on "a button was clicked"</span><span class="chip c-dec">trade-off</span></li>
       <li><span class="t">Can capture text typed into inputs &rarr; PII risk on a finance product</span><span class="chip c-dec">trade-off</span></li>
+      <li><span class="t">Every event counts toward volume &rarr; cost; the same click can fire twice (double-count)</span><span class="chip c-dec">trade-off</span></li>
     </ul>
-    <div class="callout"><b>Strategy:</b> our curated <span class="kw">snake_case</span> named events are the source of truth. Keep auto-capture <b>off</b> for the tracking plan; existing autocapture events = migration backlog to deprecate.</div>
-    <h3 style="margin-top:18px">User name / email</h3>
-    <div class="callout" style="border-left-color:var(--navy)">Store <code>$name</code> / <code>$email</code> on the <b>user profile</b> (<code>people.set</code> after <code>identify</code>) so we can find a specific user in Mixpanel - <b>never</b> as an event or super property (keeps PII out of every event &amp; export). Identity key = stable internal user ID, not the email.</div>
+    <div class="callout"><b>What we'll do:</b> curated <span class="kw">snake_case</span> named events = the <b>source of truth</b>. Keep autocapture <b>off</b> (or tightly scoped); one owner per event; existing autocapture events = migration backlog to deprecate.</div>
+  </section>
+
+  <!-- 3c USER IDENTITY DECISION -->
+  <section class="slide">
+    <div class="eyebrow">Part 1 · Decision</div>
+    <h2>User identity &amp; PII</h2>
+    <p class="lead" style="font-size:clamp(15px,1.8vw,23px)">Recognise a specific person in Mixpanel - and keep their personal data out of the event stream.</p>
+    <div class="callout" style="margin-top:16px"><b>Identify by a stable internal user ID</b> - not the email. Emails change; the ID doesn't, and it keeps email out of the identity key.</div>
+    <div class="callout"><b>Name / email go on the user profile only</b> (<code>people.set</code> after <code>identify</code>) - so we can look a user up. <b>Never</b> on events or super-properties.</div>
+    <div class="callout" style="border-left-color:var(--navy)"><b>Why:</b> if email rode on every event, it would land in every report &amp; export - PII smeared everywhere. One place (the profile) keeps it contained.</div>
   </section>
 
   <!-- 4 STAGE 2 -->
@@ -265,24 +274,6 @@
       </div>
     </div>
     <p class="kitnote"><b>Owner runs PM -> R&amp;D -> PM.</b> Two human checkpoints: PM sign-off after Plan; events firing / PR review before Publish. &nbsp; <b>Skill</b> = automated (includes the Mixpanel MCP where shown). <b>Built</b> = live today. <b>TBD</b> = candidate for a future skill, hand-coded for now.</p>
-  </section>
-
-  <!-- 7 THE KIT - SKILLS EXPLAINED -->
-  <section class="slide">
-    <div class="eyebrow">The Mixpanel Kit</div>
-    <h2>3 skills, one pipeline</h2>
-    <p class="lead" style="font-size:clamp(15px,1.7vw,22px);margin-top:.25em">Measure <span class="kw">(why)</span> &rarr; Plan <span class="kw">(what + Jira)</span> &rarr; Publish <span class="kw">(activate)</span>. &nbsp;Two human checkpoints: <span class="kw">PM sign-off</span> and <span class="kw">PR review</span>.</p>
-    <ul class="skills-list" style="margin-top:14px">
-      <li style="margin:.7em 0"><b><code>mixpanel-measure</code> - decide why before tracking anything.</b><br>
-        <span class="sub">A quick guided session that pins down the business question, the metrics that answer it, the North Star, and what "success" means. The antidote to "track every click."</span><br>
-        <b style="color:var(--navy)">Output: the Use Cases + Measurement Framework tabs.</b></li>
-      <li style="margin:.7em 0"><b><code>mixpanel-tracking-plan</code> - turn a feature into a build-ready plan.</b><br>
-        <span class="sub">Reads the Figma, the help-center article, and the real product code, then writes the events + properties in the exact 20-column doc R&amp;D needs - North Star event first - and opens the Jira ticket.</span><br>
-        <b style="color:var(--navy)">Output: the Tracking Plan (sheet / TSV / CSV) + the R&amp;D ticket.</b></li>
-      <li style="margin:.7em 0"><b><code>mixpanel-publish</code> - after R&amp;D ships, finish it in Mixpanel.</b><br>
-        <span class="sub">Checks the events are actually firing, fills the Lexicon (display names, descriptions, tags, verified) via the Mixpanel MCP, validates data quality (catches junk like "undefined"), then builds the dashboards and metrics.</span><br>
-        <b style="color:var(--navy)">Output: enriched Lexicon + validated data + live dashboards.</b></li>
-    </ul>
   </section>
 
   <!-- 8 WHAT IS LEFT -->
