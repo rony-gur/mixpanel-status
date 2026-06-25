@@ -182,21 +182,6 @@
     <div class="callout" style="border-left-color:var(--navy)">Store <code>$name</code> / <code>$email</code> on the <b>user profile</b> (<code>people.set</code> after <code>identify</code>) so we can find a specific user in Mixpanel - <b>never</b> as an event or super property (keeps PII out of every event &amp; export). Identity key = stable internal user ID, not the email.</div>
   </section>
 
-  <!-- 3b GROUP ANALYTICS -->
-  <section class="slide">
-    <div class="eyebrow">Set up · decision</div>
-    <h2>Group Analytics - do we pay?</h2>
-    <p class="lead" style="font-size:clamp(15px,1.7vw,21px)">Mixpanel counts <span class="kw">users</span> by default. The paid add-on lets us count <span class="kw">accounts</span>.</p>
-    <table class="cmp">
-      <tr><th>What we want</th><th>Without (free)</th><th>With (paid)</th></tr>
-      <tr><td>List / rank by org; count active accounts</td><td class="y">&#10003; distinct count of <code>organization_id</code></td><td class="y">&#10003;</td></tr>
-      <tr><td><b>Account retention</b> - do accounts come back</td><td class="n">&#10007; engine follows users</td><td class="y">&#10003;</td></tr>
-      <tr><td><b>Account funnels</b> - % of accounts converted</td><td class="n">&#10007; converts per user</td><td class="y">&#10003;</td></tr>
-      <tr><td><b>Group profiles</b> - ARR, plan, seats to cohort on</td><td class="n">&#10007; none</td><td class="y">&#10003;</td></tr>
-    </table>
-    <div class="callout"><b>Why we'd pay:</b> letting <code>organization_id</code> be the <b>linking column</b> in retention &amp; funnels is exactly what the add-on does - counting accounts is free; account retention + funnels need it. <b>Group key:</b> <code>organization_account_id</code> (customer) vs <code>organization_id</code> (workspace).</div>
-  </section>
-
   <!-- 4 STAGE 2 -->
   <section class="slide">
     <div class="eyebrow">Part 2</div>
